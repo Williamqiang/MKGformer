@@ -118,9 +118,11 @@ def main():
         aux_processor.feature_extractor.size, aux_processor.feature_extractor.crop_size = args.aux_size, args.aux_size
         rcnn_processor = CLIPProcessor.from_pretrained(args.vit_name)
         rcnn_processor.feature_extractor.size, rcnn_processor.feature_extractor.crop_size = args.rcnn_size, args.rcnn_size
+        #获取visual encoder
         clip_model = CLIPModel.from_pretrained(args.vit_name)
         clip_vit = clip_model.vision_model
-
+        
+        #加载数据集
         processor = data_process(data_path, re_path, args.bert_name, clip_processor=clip_processor, aux_processor=aux_processor, rcnn_processor=rcnn_processor)
         train_dataset = dataset_class(processor, transform, img_path, aux_path, args.max_seq, aux_size=args.aux_size, rcnn_size=args.rcnn_size, mode='train')
         train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True)
@@ -135,7 +137,7 @@ def main():
         num_labels = len(re_dict)
         tokenizer = processor.tokenizer
 
-        # test
+        # 组装整个模型
         vision_config = CLIPConfig.from_pretrained(args.vit_name).vision_config
         text_config = BertConfig.from_pretrained(args.bert_name)
         bert = BertModel.from_pretrained(args.bert_name)
