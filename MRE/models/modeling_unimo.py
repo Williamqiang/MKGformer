@@ -536,19 +536,21 @@ class BertLayer(nn.Module):
             output_qks=output_qks,
             current_layer=current_layer,
         )
-        attention_output = self_attention_outputs[0]
+        attention_output = self_attention_outputs[0] #注意力的计算结果（add+norm的计算结果）
 
-        outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
-
+        outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights #attention 权重
+        
+        #Agg𝑖(𝒙𝑣) = softmax(𝑺𝑖)𝒙𝑣, (1 ≤ 𝑖 < 𝑛)   fusion_output
         layer_output = apply_chunking_to_forward(
             self.feed_forward_chunk, self.chunk_size_feed_forward, self.seq_len_dim, attention_output, fusion_output
-        )
+        ) 
         outputs = (layer_output,) + outputs
         if output_qks: 
             outputs += (qks,)
 
         return outputs
-
+    
+    # activate(hidden_states + fusion_states) 
     def feed_forward_chunk(self, attention_output, fusion_output):
         intermediate_output = self.intermediate(attention_output, fusion_output)
         layer_output = self.output(intermediate_output, attention_output)
