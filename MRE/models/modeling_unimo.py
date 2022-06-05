@@ -653,6 +653,8 @@ class BertPooler(nn.Module):
 
 class UnimoModel(nn.Module):
     def __init__(self, vision_config, text_config, add_pooling_layer=True):
+        #调用时只初始化了vision_config和text_config,而add_pooling_layer使用了默认值
+
         super(UnimoModel, self).__init__()
         # vision model
         self.vision_config = vision_config
@@ -687,7 +689,8 @@ class UnimoModel(nn.Module):
     ):
         # pre vision
         vision_embedding_output = self.vision_embeddings(pixel_values, aux_values, rcnn_values)
-        vision_embedding_output = self.vision_pre_layrnorm(vision_embedding_output)
+        vision_embedding_output = self.vision_pre_layrnorm(vision_embedding_output) #就是一层layernorm
+
 
         # pre text
         input_shape = input_ids.size()
